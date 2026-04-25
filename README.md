@@ -3,7 +3,6 @@
 ![Versão](https://img.shields.io/badge/version-1.9.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange.svg)
-![IA](https://img.shields.io/badge/AI-Google_Gemini-purple.svg)
 
 > **NOTA DE PORTFÓLIO:** > Este é um projeto desenvolvido para um ecossistema corporativo fechado (Service Desk). O código está disponível aqui como **Showcase** das minhas habilidades em JavaScript, desenvolvimento de Extensões Chrome, Interceptação de Rede (XHR/Fetch) e Integração com IAs generativas. Por questões de segurança, a execução plena depende de ambiente autenticado.
 
