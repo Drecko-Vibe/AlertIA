@@ -1,46 +1,63 @@
-# Alert.ia | Assistente de Triagem com IA
+# Alert.ia
 
-![Versão](https://img.shields.io/badge/version-1.9.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange.svg)
+Extensão interna para o Chrome, em Manifest V3, voltada ao domínio:
 
-> **NOTA DE PORTFÓLIO:** > Este é um projeto desenvolvido para um ecossistema corporativo fechado (Service Desk). O código está disponível aqui como **Showcase** das minhas habilidades em JavaScript, desenvolvimento de Extensões Chrome, Interceptação de Rede (XHR/Fetch) e Integração com IAs generativas. Por questões de segurança, a execução plena depende de ambiente autenticado.
+- `https://servicedesk.clinicorp.tech/*`
 
-## Sobre o Projeto
-O **Alert.ia** é uma extensão de produtividade focada em automatizar e otimizar o fluxo de atendimento. Usando o conceito de *Vibe Coding*, a ferramenta lê as mensagens dos pacientes em tempo real e utiliza inteligência artificial para sugerir a transferência imediata para o assistente ou setor correto, reduzindo erros humanos e tempo de triagem.
+## O que ela faz
 
-## Funcionalidades Chave
+- observa `unassign_session`, `start_session`, `get_session_object`, `get_session_messages` e `create_task_transfer_session`
+- dispara a análise cronológica das últimas mensagens no momento em que o agente clica para abrir a conversa do paciente
+- grava a ação de transferência do agente no banco de dados para medir a taxa de conversão
+- possui inteligência para identificar múltiplos assuntos (ex: "Lexie e Steve")
+- bloqueia disparos desnecessários (como senhas e falhas no sistema) economizando tokens
+- chama a IA como rede de segurança
+- usa fallback automático entre os modelos Gemini configurados
+- mostra alerta visual apenas quando a confiança exigir ação
+- toca o som 1 vez
+- esconde o alerta após 25 segundos
+- permite ignorar protocolos ou limpar o cache via menu compacto
 
-* **Motor de IA (Gemini):** Integração com a API do Google Gemini. Ele lê o histórico do chat e sugere o especialista ideal, contando com um sistema de fallback automático entre os modelos `2.5-flash` e `3.1-flash-lite` para garantir disponibilidade.
-* **Varredura Stealth (Bridge):** Um script invisível (`page-bridge.js`) faz o *hook* direto nas requisições da plataforma original, capturando os dados na raiz de forma muito mais estável que um simples web scraping.
-* **UI Moderna e Injetada:** Interface centralizada em um Floating Action Button (FAB) com estados dinâmicos (idle, load, alert). Traz um design com *glassmorphism* e Toasts de alerta visual e sonoro.
-* **Analytics e Feedback:** Envio de métricas de conversão para o Firebase/Firestore. O sistema rastreia se a sugestão da IA foi realmente aceita pelo agente humano.
+## Arquivos
 
-## Tech Stack
+- `manifest.json`
+- `content.js`
+- `page-bridge.js`
+- `service-worker.js`
+- `styles.css`
+- `icons/`
+- `sounds/alert.wav`
 
-| Categoria | Tecnologia |
-| :--- | :--- |
-| **Core** | Vanilla JavaScript, CSS3 (Custom Properties) |
-| **Ecossistema** | Google Chrome Extensions API (Manifest V3) |
-| **Inteligência** | Google Gemini API |
-| **Database** | Firebase Firestore (REST API) |
+## Instalação no Chrome
 
-## Estrutura Básica
+1. Abra `chrome://extensions`
+2. Ative **Modo do desenvolvedor**
+3. Clique em **Carregar sem compactação**
+4. Selecione a pasta da extensão
+5. Abra `https://servicedesk.clinicorp.tech/`
+6. Inicie um atendimento para testar
 
-* `manifest.json`: Configurações e permissões (Manifest V3).
-* `content.js`: Injeção da UI, controle de estados e comunicação principal.
-* `page-bridge.js`: Interceptador de XHR/Fetch no contexto da página alvo.
-* `service-worker.js`: Processamento em background, comunicação com a API do Gemini e Firestore.
-* `styles.css`: Estilização e animações.
-* `icons/` e `sounds/`: Assets visuais e de áudio do alerta.
+## Como testar
 
-## Teste Local (Apenas para Devs Autorizados)
+- abrir a fila normalmente
+- clicar em **Atender**
+- abrir a conversa do paciente para forçar o carregamento das mensagens
+- conferir no DevTools da extensão se o `get_session_messages` foi capturado
+- transferir a sessão e verificar se a métrica foi salva no Firestore
+- testar frases com assuntos cruzados para validar a consolidação da IA
 
-1. Clone o repositório.
-2. Adicione sua própria `GEMINI_API_KEY` no arquivo `service-worker.js`.
-3. Abra `chrome://extensions` e ative o **Modo do desenvolvedor**.
-4. Clique em **Carregar sem compactação** e selecione a pasta raiz.
-5. Inicie um atendimento na plataforma alvo.
+## Debug
 
----
-Desenvolvido por *Drecko*
+Por padrão o debug está desligado.
+
+Para ativar rápido no console da extensão/service worker:
+
+```js
+chrome.storage.local.set({ debugMode: true })
+```
+
+Para desligar:
+
+```js
+chrome.storage.local.set({ debugMode: false })
+```
